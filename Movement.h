@@ -1,4 +1,8 @@
-#include "Micromouse.h"
+#ifndef	_MOVEMENT_H_
+#define	_MOVEMENT_H_
+
+#include "micromouse.h"
+#include "serial.h"
 
 
 #define MAZECENTER  0X77
@@ -6,23 +10,16 @@
 #define SOUTH       0x01
 #define EAST        0x02
 #define WEST        0x03
-#define FALSE       0
-#define TRUE        1
 
 unsigned int myPosition = 0x00;
 unsigned int myOrientation = NORTH;
 
-
-//Movement.h
-
-
-
 void TurnRight(){
 	//put other code right below here
     myPosition = myPosition;
-    txput(SPINRIGHT);  
+    	transmit(4, LFORW, 0x80, RBACKW, 0x80); // spin right
     delay(spin_delay_r);
-    Stop();
+    stop();
 	switch(myOrientation){
 		case NORTH: myOrientation = EAST; break;
 		case SOUTH: myOrientation = WEST; break;
@@ -32,16 +29,14 @@ void TurnRight(){
 	}	
 	delay(1000);
 	forward_correct();
-return;
 }
 
 
 void TurnLeft(){
-	//put other code right below here
     myPosition = myPosition;
-    txput(SPINLEFT);  
+	    transmit(4, LBACKW, 0x80, RFORW, 0x80); // spin left
     delay(spin_delay_l);
-    Stop();
+    stop();
 
 	switch(myOrientation){
 		case NORTH: myOrientation = WEST; break;
@@ -52,25 +47,12 @@ void TurnLeft(){
 	}
 	delay(1000);
 	forward_correct();
-return;
 }
 
 
 void Forward(left, right){
-
-	//put other code right below here
-
-    char command[5] =  motors_forward;
-    int j = 0;
+    transmit(4, LFORW, left, RFORW, right);
     
-    command[1] = right;
-    command[3] = left;
-    txput(command);
-   
-    delay(forward_delay);    
-
-    Stop();
-
 	myOrientation = myOrientation;
 	
 	switch(myOrientation){
@@ -79,14 +61,12 @@ void Forward(left, right){
 		case EAST:	myPosition += 0x01; break;
 		case WEST:	myPosition -= 0x01; break;
 		default: myPosition = myPosition;
-	}	
-	delay(1000);
+	}
 return;
 }
 
-void Stop(void)
+void stop(void)
 {   
-    txput(motors_stop);
-    delay(4000);
-    return;
+    transmit(4, LFORW, 0, RFORW, 0); // stop the motors
 }
+#endif
